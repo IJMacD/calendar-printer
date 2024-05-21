@@ -1,3 +1,14 @@
+export function formatDate(date = new Date, basic = false) {
+    const y = date.getFullYear().toString().padStart(4, "0");
+    const m = (date.getMonth() + 1).toString().padStart(2, "0");
+    const d = date.getDate().toString().padStart(2, "0");
+
+    if (basic) {
+        return `${y}${m}${d}`;
+    }
+
+    return `${y}-${m}-${d}`;
+}
 
 /**
  * @param {Date} date

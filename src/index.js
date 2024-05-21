@@ -3,6 +3,7 @@ import fs from "fs";
 import { Tides } from "./tides.js";
 import { getWeekDate } from "./iso8601.js";
 import { Moon } from "./moon.js";
+import { Holidays } from "./holidays.js";
 
 if (process.argv.length < 3) {
     console.log(`Usage: node ${process.argv[1]} <output.pdf>`);
@@ -18,6 +19,7 @@ doc.pipe(fs.createWriteStream(process.argv[2]));
 
 const tides = new Tides();
 const moon = new Moon();
+const holidays = new Holidays();
 
 const dateFormatter = new Intl.DateTimeFormat("fr-CA", { year: "numeric", month: "2-digit", day: "2-digit", timeZone: "+08:00" });
 const dayFormatter = new Intl.DateTimeFormat("en-GB", { weekday: "long", timeZone: "+08:00" });
@@ -33,6 +35,8 @@ await printTideInfo(doc, date, 140);
 doc.x = 25 + 125 + 2;
 doc.y = startY;
 printNoteLines(doc);
+
+await printPublicHolidays(doc, date, 545 - doc.x);
 
 doc.end();
 
@@ -160,6 +164,30 @@ function printNoteLines(doc, width = 545.276, height = 735, spacing = 8.75) {
     doc.lineWidth(0.5);
     doc.dash(2, { space: 2 });
     doc.stroke("#CCC");
+}
+
+/**
+ * @param {PDFKit.PDFDocument} doc
+ * @param {Date} date
+ */
+async function printPublicHolidays(doc, date, width = 545, dayHeight = 105) {
+    const now = +date;
+
+    const { x: originX, y: originY } = doc;
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(now + i * 86400000);
+
+        const holiday = await holidays.getHoliday(date);
+
+        if (holiday) {
+            doc.fillColor("#CCC");
+            doc.text(holiday, originX, originY + i * dayHeight + 1, {
+                width,
+                align: "right",
+            });
+        }
+    }
 }
 
 function getMonday(refDate = new Date) {
