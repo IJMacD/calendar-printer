@@ -45,14 +45,17 @@ async function printHorizontalWeek(doc, date) {
 
   const { x, y } = doc;
 
-  const dayWidth = 109;
-
-  await printDayBoxesWithTides(doc, startDate, 900, dayWidth, 143);
-
   doc.x = x + 1;
   doc.y = y + 74;
 
   printNoteLines(doc, 826, 60, 17);
+
+  const dayWidth = 109;
+
+  doc.x = x;
+  doc.y = y;
+
+  await printDayBoxesWithTides(doc, startDate, 900, dayWidth, 143);
 
   doc.y += 2;
 
