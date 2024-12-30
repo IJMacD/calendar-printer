@@ -38,6 +38,7 @@ for (const mode of options.mode) {
       printWeekly(filename, options.date);
       break;
     case "four-weeks":
+    case "four-weekly":
       printFourWeeks(filename, options.date);
       break;
     case "monthly":

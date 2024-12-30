@@ -35,26 +35,56 @@ export async function printMoonPhase(doc, date, horizontalScope = 0) {
     const r = 5;
     const r2 = r * 2;
     const cx = x + r + horizontalScope * dayFrac;
-    const cy = y + r;
+    const cy = y + r2;
+
+    if (horizontalScope > 0) {
+      doc.moveTo(x, y - 2);
+      doc.lineTo(x, y + r2);
+
+      doc.moveTo(x + horizontalScope / 4, y - 2);
+      doc.lineTo(x + horizontalScope / 4, y + r2);
+
+      doc.moveTo(x + horizontalScope / 2, y - 2);
+      doc.lineTo(x + horizontalScope / 2, y + r2);
+
+      doc.moveTo(x + 3 * horizontalScope / 4, y - 2);
+      doc.lineTo(x + 3 * horizontalScope / 4, y + r2);
+
+      doc.moveTo(x + horizontalScope, y - 2);
+      doc.lineTo(x + horizontalScope, y + r2);
+
+      doc.lineWidth(0.5);
+      doc.dash(2, { space: 2 });
+      doc.stroke("#CCC");
+      doc.undash();
+    }
+
+    doc.stroke("#000");
+    doc.fill("#FFF");
+    doc.lineWidth(1);
+
+    doc.circle(cx - r, cy - r, r).fill();
+    doc.circle(cx - r, cy - r, r).stroke();
+
+    doc.fill("#000");
 
     doc.save();
 
-    doc.circle(cx, cy, r).stroke();
-
     switch (moonPhase.phase) {
       case 0:
-        doc.circle(cx, cy, r).fill();
+        doc.circle(cx - r, cy - r, r).fill();
         break;
       case 1:
-        doc.rect(cx - r, y, r, r2).clip();
-        doc.circle(cx, cy, r).fill();
+        doc.rect(cx - r2, y, r, r2).clip();
+        doc.circle(cx - r, cy - r, r).fill();
         break;
       case 3:
-        doc.rect(cx, y, r, r2).clip();
-        doc.circle(cx, cy, r).fill();
+        doc.rect(cx - r, y, r, r2).clip();
+        doc.circle(cx - r, cy - r, r).fill();
         break;
     }
 
+    // Release clip
     doc.restore();
   }
 }
@@ -98,10 +128,10 @@ export async function printDayBoxesWithTides(
 
     doc.lineWidth(1);
     doc.stroke("#000");
-    doc.rect(doc.x + 2, doc.y, boxWidth, boxHeight);
+    doc.rect(doc.x, doc.y, boxWidth, boxHeight);
     doc.stroke();
 
-    doc.x += 5;
+    doc.x += 3;
     doc.y += 5;
 
     // Date/Day
@@ -109,7 +139,7 @@ export async function printDayBoxesWithTides(
 
     // Moon
     const { x, y } = doc;
-    doc.x = dayOriginX;
+    doc.x = dayOriginX + 5;
     await printMoonPhase(doc, date, boxWidth - 10);
     doc.x = x;
     doc.y = y;
